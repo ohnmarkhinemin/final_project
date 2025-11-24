@@ -28,10 +28,23 @@ bmw_sales_decade <- bmw_sales %>%
 # Top 3 popular models
 
 ```{r}
-#rank BMW models by sales volume
-#will use object bmw)decade_top3 for inline text describing top 3
+# rank BMW models by sales volume
+# will use object bmw)decade_top3 for inline text describing top 3
 bmw_decade_top3 <- bmw_sales_decade |> 
   group_by(Model) |> 
   summarize(Model_Sales = sum(Sales_Volume)) |> 
   arrange(desc(Model_Sales))
+```
+
+# Select relevant variables and filter data
+
+```{r}
+# only include top 3 bestselling models and relevant variables in dataset
+bmw_sales_decade <- bmw_sales_decade |>
+  filter(
+    Model == '7 Series' |
+    Model == '3 Series' |
+    Model == 'i8'
+  ) |>
+  select(Model, Year, Region, Color, Fuel_Type, Price_USD, Sales_Volume)
 ```
