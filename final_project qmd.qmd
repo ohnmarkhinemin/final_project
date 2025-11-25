@@ -3,6 +3,7 @@ title: "final_project"
 author: "Dodjivi Amekoudji, Emily Lang, Jessica Marshall, Kat Vrotsos"
 format: html
 editor: visual
+imbed_resources: true
 ---
 
 ```{r}
@@ -11,6 +12,8 @@ editor: visual
 library(here)
 library(tidyverse)
 library(ggplot2)
+library(readr)
+library(knitr)
 ```
 
 # Load the data
@@ -50,9 +53,51 @@ bmw_sales_decade <- bmw_sales_decade |>
   select(Model, Year, Region, Color, Fuel_Type, Price_USD, Sales_Volume)
 ```
 
-Top colors by year
+# Top colors by year
 
 ```{r}
+#| output: asis
+# Table
+
+# 1. Average Sales by Year and Color
+avgsales <- bmw_sales_decade |> 
+  group_by(Year, Color) |>
+  summarize(mean_sales = mean(Sales_Volume), .groups = "drop")
+
+# 2. Summary Table (Long)
+summary_table <- avgsales |>
+  arrange(Year, Color)
+
+summary_table
+
+# 3. Formatted Table
+kable(
+  summary_table,
+  col.names = c("Year", "Color", "Mean Sales Volume"),
+  caption = "Average BMW Sales by Color and Year"
+)
+
+# 4. Wide Table
+summary_wide <- avgsales |>
+  pivot_wider(
+    names_from = Year,
+    values_from = mean_sales
+  )
+
+summary_stats <- avgsales |>
+  group_by(Color) |>
+  summarize(
+    avg_sales = mean(mean_sales),
+    total_sales = sum(mean_sales),
+    .groups = "drop"
+  )
+
+summary_stats
+```
+
+```{r}
+# Figure
+
 salescoloryear<- bmw_sales_decade |> 
   select(Color, Year, Sales_Volume)
 avgsales<- salescoloryear |> 
@@ -99,7 +144,7 @@ theme_minimal()
 
 ```
 
-Visualization Trends in BMW Model Price From 2014 to 2024 by Region
+# Visualization Trends in BMW Model Price From 2014 to 2024 by Region
 
 ```{r}
 bmw_sales_decade |>
@@ -113,3 +158,5 @@ bmw_sales_decade |>
   ) +
   facet_wrap(~Region)
 ```
+
+We will use pivot_longer() to change data back to tidy version
